@@ -1,7 +1,6 @@
 .model small
 .stack 100h
 .data
-
 .code
 main proc
 
@@ -16,7 +15,6 @@ main proc
     xor ax, dx      
     xor dx, ax    
     xor ax, dx   
-
 
     mov ah, 4Ch    
     int 21h
