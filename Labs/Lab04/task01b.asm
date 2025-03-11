@@ -3,7 +3,7 @@
 .data
     array dw 7*8 dup(0)  
 .code
-main:
+main proc 
     mov ax, @data
     mov ds, ax
     lea di, array     
@@ -40,4 +40,6 @@ inner_loop:
 end_prog:
     mov ax, 4Ch
     int 21h
+
+main endp
 end main
