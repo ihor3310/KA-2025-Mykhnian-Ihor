@@ -6,36 +6,39 @@
 main proc 
     mov ax, @data
     mov ds, ax
-    lea di, array     
+    lea si, array
 
-    xor dx, dx          
-    mov cx, 7           
-    mov bp, 56      
+    mov ax, 0  
+    mov bx, 0
+    mov bp, 0
+    mov sp, 0
 
-row_loop:
-    push dx              
-    mov bx, 0           
-    mov si, 8         
+count_column:
+    mov di, ax
+    mov ax, bp
+    mov bx, sp
+    mov cx, 3        
+    add cx, bx     
+    mov dx, 2        
+    mul dx           
+    mov dx, dx        
+    mov cx, cx     
+    mul cx          
+    inc bp  
+    mov [si], di
+    add si, 2    
+    cmp bp, 7 
+    jne count_column
+    inc sp
+    cmp sp, 8
+    jne zero_col
+    jmp end_prog
 
-inner_loop:
-    mov ax, 2            
-    mul bx              
-    mov cx, dx          
-    add cx, 3           
-    mul cx             
-    mov [di], ax         
-    add di, 2           
-    inc bx                
+zero_col:
+    mov ax, 0
+    mov bp, 0
+    jmp count_column
 
-    dec bp
-    cmp bp, 0            
-    je end_prog          
-
-    loop inner_loop      
-
-    pop dx               
-    inc dx               
-    loop row_loop      
 
 end_prog:
     mov ax, 4Ch
