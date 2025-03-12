@@ -4,21 +4,6 @@
     f_num dw 6   
     s_num dw -4   
 .code
-
-save_regs proc
-    push ax       
-    push bx     
-    push dx        
-    ret
-save_regs endp
-
-restore_regs proc
-    pop dx         
-    pop bx          
-    pop ax        
-    ret
-restore_regs endp
-
 main proc  
     mov ax, @data   
     mov ds, ax      
@@ -28,24 +13,31 @@ main proc
     mov ax, s_num    
     push ax          
 
-    pop bx           
+    push ax         
+    push bx          
+    push dx         
+
+    pop bx          
     pop ax           
-    imul bx          
+    imul bx      
 
     push ax          
     push dx          
 
-    pop dx           
+    pop dx          
     pop ax           
-    and dx, dx      
-    jns end_prog     
-    neg ax           
+    and dx, dx       
+    jns end_prog   
 
-    call save_regs  
-    call restore_regs  
+    neg ax            
+
+    pop dx         
+    pop bx          
+    pop ax         
 
 end_prog:
     mov ah, 4Ch      
     int 21h
+    
 main endp
 end main
