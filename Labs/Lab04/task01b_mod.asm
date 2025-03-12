@@ -1,63 +1,57 @@
 .model small
 .stack 100h
 .data
-    array dw 56 dup(0)
+    array dw 7*8 dup(0) 
+
 .code
-calc proc 
-    mov ax, 2
-    mul bx
-    mov cx, dx
-    add cx, 3
-    mul cx
-    ret
-calc endp
-
-write_ax proc 
-    push ax
-    push bx
-    push dx
-    mov cx, dx
-    mov ax, 8
-    mul cx
-    add ax, bx
-    shl ax, 1
-    lea di, array
-    add di, ax
-    pop dx
-    pop bx
-    pop ax
-    mov [di], ax
-    ret
-write_ax endp
-
 main proc
     mov ax, @data
     mov ds, ax
-    lea di, array
-    xor dx, dx
-    mov cx, 7
-    mov bp, 56
+    lea si, array    
 
-row_loop:
-    push dx
+    mov ax, 0           
     mov bx, 0
-    mov si, 8
+    mov bp, 0
+    mov sp, 0
 
-inner_loop:
-    call calc
-    call write_ax
-    inc bx
-    dec bp
-    cmp bp, 0
-    je end_prog
-    loop inner_loop
+count_column:
+    call calc_value
+    call write_value_to_array
+    
+    add si, 2            
+    inc bp               
+    cmp bp, 7
+    jne count_column    
+    inc sp              
+    cmp sp, 8
+    jne zero_col         
+    jmp end_prog         
 
-    pop dx
-    inc dx
-    loop row_loop
+zero_col:
+    mov ax, 0
+    mov bp, 0
+    jmp count_column     
+
+calc_value proc
+    mov ax, sp          
+    mov bx, bp          
+    add bx, 3            
+    mov cx, bx           
+    mov bx, sp           
+    mov dx, 2           
+    mul bx               
+    mul cx             
+    ret
+calc_value endp
+
+write_value_to_array proc
+    mov [si], ax
+    ret
+write_value_to_array endp
 
 end_prog:
     mov ax, 4Ch
     int 21h
+    
 main endp
 end main
