@@ -2,7 +2,7 @@ import sys
 
 def binary_convert():
     pass
-
+    
 def mediana(data):
     data_int = list(map(int, data.split()))
     len_arr = len(data_int)
@@ -13,7 +13,8 @@ def mediana(data):
         return data_int[len_arr // 2]
 
 def average_value(data):
-    pass
+    data_int = list(map(int, data.split()))
+    return sum(data_int) // len(data_int)
 
 def analz_file(filename):
     with open(filename, "r") as data:
@@ -24,3 +25,5 @@ if __name__ == "__main__":
     file_data = analz_file(filename)
     med = mediana(file_data)
     print(med)
+    mid_ar = average_value(file_data)
+    print(mid_ar)
