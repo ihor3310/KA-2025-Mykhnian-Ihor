@@ -1,7 +1,15 @@
 import sys
 
+def binary_convert(nm):
+    if nm > 32767:
+        nm = 32767
+    if nm < -32767:
+        nm = -32767
+    return nm
+
 def bubble_sort(arr):
     n = len(arr)
+
     for i in range(n):
         for j in range(0, n - i - 1):
             if arr[j] > arr[j + 1]:
@@ -9,7 +17,7 @@ def bubble_sort(arr):
     return arr
 
 def mediana(data):
-    data_int = list(map(int, data.split()))
+    data_int = list(map(binary_convert, map(int, data.split())))
     sorted_data = bubble_sort(data_int) 
     len_arr = len(sorted_data)
 
@@ -19,7 +27,7 @@ def mediana(data):
         return sorted_data[len_arr // 2]
 
 def average_value(data):
-    data_int = list(map(int, data.split()))
+    data_int = list(map(binary_convert, map(int, data.split())))
     sorted_data = bubble_sort(data_int)
     return sum(sorted_data) // len(sorted_data)
 
