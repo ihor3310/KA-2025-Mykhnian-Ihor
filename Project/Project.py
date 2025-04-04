@@ -7,18 +7,36 @@ def binary_convert(nm):
         nm = -32767
     return nm
 
-def bubble_sort(arr):
-    n = len(arr)
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    
+    mid = len(arr) // 2
+    left_half = merge_sort(arr[:mid])
+    right_half = merge_sort(arr[mid:])
+    
+    return merge(left_half, right_half)
 
-    for i in range(n):
-        for j in range(0, n - i - 1):
-            if arr[j] > arr[j + 1]:
-                arr[j], arr[j + 1] = arr[j + 1], arr[j] 
-    return arr
+def merge(left, right):
+    sorted_arr = []
+    i = j = 0
+    
+    while i < len(left) and j < len(right):
+        if left[i] < right[j]:
+            sorted_arr.append(left[i])
+            i += 1
+        else:
+            sorted_arr.append(right[j])
+            j += 1
+    
+    sorted_arr.extend(left[i:])
+    sorted_arr.extend(right[j:])
+    
+    return sorted_arr
 
 def mediana(data):
     data_int = list(map(binary_convert, map(int, data.split())))
-    sorted_data = bubble_sort(data_int) 
+    sorted_data = merge_sort(data_int) 
     len_arr = len(sorted_data)
 
     if len_arr % 2 == 0:
@@ -28,7 +46,7 @@ def mediana(data):
 
 def average_value(data):
     data_int = list(map(binary_convert, map(int, data.split())))
-    sorted_data = bubble_sort(data_int)
+    sorted_data = merge_sort(data_int)
     return sum(sorted_data) // len(sorted_data)
 
 def analz_file(filename):
