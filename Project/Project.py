@@ -3,8 +3,8 @@ import sys
 def binary_convert(nm):
     if nm > 32767:
         nm = 32767
-    if nm < -32767:
-        nm = -32767
+    if nm < -32768:
+        nm = -32768
     return nm
 
 def merge_sort(arr):
@@ -22,7 +22,7 @@ def merge(left, right):
     i = j = 0
     
     while i < len(left) and j < len(right):
-        if left[i] < right[j]:
+        if left[i] < right[j]: 
             sorted_arr.append(left[i])
             i += 1
         else:
@@ -34,9 +34,8 @@ def merge(left, right):
     
     return sorted_arr
 
-def mediana(data):
-    data_int = list(map(binary_convert, map(int, data.split())))
-    sorted_data = merge_sort(data_int) 
+def mediana(data_int):
+    sorted_data = merge_sort(data_int)
     len_arr = len(sorted_data)
 
     if len_arr % 2 == 0:
@@ -44,8 +43,7 @@ def mediana(data):
     else:
         return sorted_data[len_arr // 2]
 
-def average_value(data):
-    data_int = list(map(binary_convert, map(int, data.split())))
+def average_value(data_int):
     sorted_data = merge_sort(data_int)
     return sum(sorted_data) // len(sorted_data)
 
@@ -56,7 +54,10 @@ def analz_file(filename):
 if __name__ == "__main__":
     filename = sys.argv[1]
     file_data = analz_file(filename)
-    med = mediana(file_data)
-    print(med)
-    mid_ar = average_value(file_data)
-    print(mid_ar)
+    data_int = list(map(binary_convert, map(int, file_data.split())))
+
+    if len(data_int) <= 10000:
+        med = mediana(data_int)
+        print(med)
+        mid_ar = average_value(data_int)
+        print(mid_ar)
