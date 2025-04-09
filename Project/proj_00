@@ -1,30 +1,31 @@
-.model tiny
+.model small
 .stack 100h
+
+.data
+num db '413$', 0
+newNum db 10 dup(0)
+
 .code
-org 100h
-start:
-    lea si, num        
-    lea di, newNum      
+main:
+    mov ax, @data
+    mov ds, ax            
 
-    mov dx, offset num  
-    mov ah, 09h         
+    lea si, num
+    lea di, newNum
+
+    shift_right:
+    mov al, [si]
+    cmp al, '$'           
+    je done
+    mov dl, al
+    mov ah, 02h
     int 21h
 
-shift_right:
-    mov al, [si]          
-    mov dl, al            
-    mov ah, 02h           
-    int 21h           
+    inc si
+    jmp shift_right
 
-    inc si                
-    mov al, [si]          
-    mov dl, al             
-    mov ah, 02h          
-    int 21h            
-
-    mov ah, 4Ch        
+done:
+    mov ah, 4Ch
     int 21h
 
-num db '413$', 0          
-newNum db 10 dup(0)        
-end start
+end main
