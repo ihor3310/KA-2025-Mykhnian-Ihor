@@ -1,0 +1,19 @@
+.model tiny
+.stack 100h
+.code
+org 100h
+start:
+    lea si, num
+    lea di, newNum
+
+    
+    mov dx, offset num  
+    mov ah, 09h         
+    int 21h
+
+    mov ah, 4Ch        
+    int 21h
+
+num db '13', '$'   
+new_num db 10 dup(0)
+end start
