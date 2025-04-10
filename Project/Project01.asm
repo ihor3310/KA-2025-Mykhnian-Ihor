@@ -20,7 +20,8 @@ skip:
     inc bx
     loop skip
 copy:
-    jcxz open
+    cmp cx, 0
+    je open
     mov dl, byte ptr es:[bx]
     mov newline[si], dl
     inc si
@@ -48,9 +49,34 @@ read:
     int 21h
     jmp read
 end_r:
-    mov ah, 3Eh
-    mov bx, save_id
+    lea si, buffer  
+process_numbers:
+    mov al, [si]   
+    cmp al, '$'   
+    je exit       
+    cmp al, ' '     
+    je skip_space 
+    sub al, '0'  
+    cbw            
+    mov bx, ax      
+    mov cx, 16
+
+print_bin:
+    shl bx, 1   
+    jc print_1
+    mov dl, '0'
+    jmp show_bit
+print_1:
+    mov dl, '1'
+show_bit:
+    mov ah, 02h
     int 21h
+    loop print_bin
+    
+skip_space:
+    inc si
+    jmp process_numbers
+
 exit:
     mov ah, 4Ch
     int 21h
