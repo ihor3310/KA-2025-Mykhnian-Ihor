@@ -9,12 +9,16 @@
 	is_negative db 0
 	result db 12 dup(0), '$'
 	temp db 12 dup(0)
+	numbers dw 100 dup(0)
+	count dw 0
+	num_buffer db 12 dup(0), '$'
 .code
 main proc
 	mov ax, @data
 	mov ds, ax
 	mov word ptr [sum_low], 0
 	mov word ptr [sum_high], 0
+	mov word ptr [count], 0
 	mov bx, 80h
 	mov cl, byte ptr es:[bx]
 	cmp cx, 0
@@ -58,28 +62,44 @@ read:
 	jmp read
 end_r:
 	lea si, buffer
-proc_numbers:
+extract_numbers:
+	call skip_spaces
 	mov al, [si]
 	cmp al, '$'
-	jne continue_check1
-	jmp process_result
-continue_check1:
+	je sort_numbers
 	cmp al, 0Dh
-	jne continue_check2
-	jmp process_result
-continue_check2:
+	je sort_numbers
 	cmp al, 0Ah
-	jne continue_check3
-	jmp process_result
-continue_check3:
-	cmp al, ' '
-	jne start_number
-	inc si
-	jmp proc_numbers
-start_number:
+	je sort_numbers
+	push si
 	call convert_number
-	call add_to_sum
-	jmp proc_numbers
+	pop si
+	mov di, word ptr [count]
+	shl di, 1
+	mov numbers[di], bx
+	inc word ptr [count]
+	mov ax, bx
+	cwd
+	add word ptr [sum_low], ax
+	adc word ptr [sum_high], dx
+find_next:
+	mov al, [si]
+	cmp al, '0'
+	jb found_next
+	cmp al, '9'
+	ja found_next
+	inc si
+	jmp find_next
+found_next:
+	jmp extract_numbers
+sort_numbers:
+	cmp word ptr [count], 0
+	je display_sum
+	call bubble_sort
+display_sum:
+	mov ah, 9
+	lea dx, result
+	int 21h
 process_result:
 	mov ax, word ptr [sum_high]
 	and ax, 8000h
@@ -132,10 +152,10 @@ finish_output:
 	mov byte ptr [result], '0'
 	inc si
 output_result:
-	mov byte ptr [si], '$'
-	mov ah, 9
-	lea dx, result
-	int 21h
+	;mov byte ptr [si], '$'
+	;mov ah, 9
+	;lea dx, result
+	;int 21h
 	jmp exit
 exit:
 	mov ah, 3Eh
@@ -144,6 +164,16 @@ exit:
 	mov ah, 4Ch
 	int 21h
 main endp
+skip_spaces proc
+skip_space_loop:
+	mov al, [si]
+	cmp al, ' '
+	jne skip_space_done
+	inc si
+	jmp skip_space_loop
+skip_space_done:
+	ret
+skip_spaces endp
 convert_number proc
 	xor bx, bx
 	xor dx, dx
@@ -182,18 +212,95 @@ negative_limit:
 	mov bx, 32768
 end_convert:
 	cmp cl, 1
-    jne finish_convert
-	not bx
+	jne finish_convert
+    not bx
 	add bx, 1
 finish_convert:
 	ret
 convert_number endp
-add_to_sum proc
-	mov ax, bx
-	cwd
-	add word ptr [sum_low], ax
-	adc word ptr [sum_high], dx
-	inc si
+bubble_sort proc
+	push ax
+	push bx
+	push cx
+	push si
+	mov cx, word ptr [count]
+	dec cx
+	jz sort_exit
+outerLoop:
+	push cx
+	lea si, numbers
+innerLoop:
+	mov ax, [si]
+	cmp ax, [si+2]
+	jle nextiStep
+	xchg ax, [si+2]
+	mov [si], ax
+nextiStep:
+	add si, 2
+	loop innerLoop
+	pop cx
+	loop outerLoop
+sort_exit:
+	pop si
+	pop cx
+	pop bx
+	pop ax
+
+	push ax
+	push bx
+	push cx
+	push dx
+	push si
+	push di
+	xor si, si
+	mov cx, word ptr [count]
+display_loop:
+	mov ax, numbers[si]
+	mov bx, 10
+	test ax, 8000h
+	jz pos_number
+	mov dl, '-'
+	mov ah, 02h
+	int 21h
+	neg ax
+pos_number:
+	mov di, offset num_buffer
+	mov byte ptr [di], '$'
+	dec di
+digit_loop:
+	xor dx, dx
+	div bx
+	add dl, '0'
+	dec di
+	mov [di], dl
+	test ax, ax
+	jnz digit_loop
+	mov ah, 09h
+	mov dx, di
+	int 21h
+	dec cx
+	jz no_space
+	mov dl, ' '
+	mov ah, 02h
+	int 21h
+no_space:
+	add si, 2
+	cmp cx, 0
+	jnz display_loop
+	mov dl, 13
+	mov ah, 02h
+	int 21h
+	mov dl, 10
+	mov ah, 02h
+	int 21h
+	pop di
+	pop si
+	pop dx
+	pop cx
+	pop bx
+	pop ax
 	ret
-add_to_sum endp
+bubble_sort endp
+
+
 end main
