@@ -12,6 +12,7 @@
 	numbers dw 100 dup(0)
 	count dw 0
 	num_buffer db 12 dup(0), '$'
+
 .code
 main proc
 	mov ax, @data
@@ -96,6 +97,7 @@ sort_numbers:
 	cmp word ptr [count], 0
 	je display_sum
 	call bubble_sort
+	call display_numbers
 display_sum:
 	mov ah, 9
 	lea dx, result
@@ -164,6 +166,7 @@ exit:
 	mov ah, 4Ch
 	int 21h
 main endp
+
 skip_spaces proc
 skip_space_loop:
 	mov al, [si]
@@ -174,6 +177,7 @@ skip_space_loop:
 skip_space_done:
 	ret
 skip_spaces endp
+
 convert_number proc
 	xor bx, bx
 	xor dx, dx
@@ -218,6 +222,7 @@ end_convert:
 finish_convert:
 	ret
 convert_number endp
+
 bubble_sort proc
 	push ax
 	push bx
@@ -245,7 +250,10 @@ sort_exit:
 	pop cx
 	pop bx
 	pop ax
+	ret
+bubble_sort endp
 
+display_numbers proc
 	push ax
 	push bx
 	push cx
@@ -300,7 +308,7 @@ no_space:
 	pop bx
 	pop ax
 	ret
-bubble_sort endp
+display_numbers endp
 
 
 end main
