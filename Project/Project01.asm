@@ -110,16 +110,45 @@ process_numbers:
 display_results:
     call average
     call display_average
-    mov ax, num_count     
-    xor dx, dx          
+    mov ax, num_count
+    xor dx, dx
     mov cx, 2
-    div cx           
-
+    div cx
+    mov si, ax
+    shl si, 1
+    mov ax, numbers[si]
+    test ax, 8000h
+    jz not_neg_mediana
+    mov dl, '-'
+    mov ah, 02h
+    int 21h
+    neg ax
+not_neg_mediana:
     mov bx, 10
     lea di, num_buffer+11
     mov byte ptr [di], '$'
     dec di
-
+digit_loop_mediana:
+    xor dx, dx
+    div bx
+    add dl, '0'
+    mov [di], dl
+    dec di
+    test ax, ax
+    jnz digit_loop_mediana
+    inc di
+    mov ah, 09h
+    mov dx, di
+    int 21h
+    mov dl, 13
+    mov ah, 02h
+    int 21h
+    mov dl, 10
+    int 21h
+    mov bx, 10
+    lea di, num_buffer+11
+    mov byte ptr [di], '$'
+    dec di
 conv_half_loop:
     xor dx, dx
     div bx
@@ -129,10 +158,6 @@ conv_half_loop:
     test ax, ax
     jnz conv_half_loop
     inc di
-
-    mov ah, 09h
-    mov dx, di
-    int 21h
     jmp exit
 exit:
     mov ah, 3Eh
