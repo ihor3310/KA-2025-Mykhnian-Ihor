@@ -73,11 +73,11 @@ extract_numbers:
     call skip_spaces
     mov al, [si]
     cmp al, '$'
-    je sort_numbers
+    je sort_numbers        
     cmp al, 0Dh
-    je sort_numbers
+    je skip_line_end   
     cmp al, 0Ah
-    je sort_numbers
+    je skip_line_end   
     push si
     call convert_number
     pop si
@@ -100,6 +100,15 @@ find_next:
     jmp find_next
 found_next:
     jmp extract_numbers
+
+skip_line_end:
+    inc si               
+    mov al, [si]
+    cmp al, 0Dh          
+    je skip_line_end    
+    cmp al, 0Ah            
+    je skip_line_end    
+    jmp extract_numbers     
 sort_numbers:
     cmp word ptr [count], 0
     jne process_numbers
