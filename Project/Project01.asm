@@ -50,7 +50,11 @@ open:
     mov ax, 3D00h
     lea dx, newline
     int 21h
-    jc exit
+    jc near_jump
+    jmp skip_jump
+near_jump:
+    jmp exit
+skip_jump:
     mov save_id, ax
 read:
     mov ah, 3Fh
@@ -106,6 +110,29 @@ process_numbers:
 display_results:
     call average
     call display_average
+    mov ax, num_count     
+    xor dx, dx          
+    mov cx, 2
+    div cx           
+
+    mov bx, 10
+    lea di, num_buffer+11
+    mov byte ptr [di], '$'
+    dec di
+
+conv_half_loop:
+    xor dx, dx
+    div bx
+    add dl, '0'
+    mov [di], dl
+    dec di
+    test ax, ax
+    jnz conv_half_loop
+    inc di
+
+    mov ah, 09h
+    mov dx, di
+    int 21h
     jmp exit
 exit:
     mov ah, 3Eh
@@ -254,6 +281,7 @@ no_space:
     pop ax
     ret
 display_numbers endp
+
 average proc
     push ax
     push bx
@@ -278,6 +306,7 @@ avg_done:
     pop ax
     ret
 average endp
+
 display_average proc
     push ax
     push bx
@@ -343,5 +372,4 @@ show_avg:
     pop ax
     ret
 display_average endp
-
 end main
